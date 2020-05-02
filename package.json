@@ -1,0 +1,27 @@
+{
+  "name": "parser",
+  "version": "1.0.0",
+  "description": "web parser",
+  "main": "index.js",
+  "scripts": {
+    "serv": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MelkiorS/parser.git"
+  },
+  "keywords": [
+    "node"
+  ],
+  "author": "andrey.volovod <andrey.volovod@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MelkiorS/parser/issues"
+  },
+  "homepage": "https://github.com/MelkiorS/parser#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
+    "moment": "^2.25.0"
+  }
+}
