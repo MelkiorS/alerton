@@ -21,11 +21,11 @@ async function parse(url) {
 function getCategories($) {
     const categoryList = []
     $('#subCategoriesList .subject').each((i, catEl) => {
-        const category = {}
-        category.name = $(catEl).find('.subjectTitle').text()
-        category.path = $(catEl).find('.subjectTitle').attr('href')
-        category.subCategory = getSubCategories($, catEl)
-        categoryList.push(category)
+        categoryList.push({
+            name: $(catEl).find('.subjectTitle').text(),
+            path: $(catEl).find('.subjectTitle').attr('href'),
+            subCategory: getSubCategories($, catEl)
+        })
     })
     return categoryList;
 }
@@ -33,11 +33,11 @@ function getCategories($) {
 function getSubCategories($, catEl) {
     const subCategoryList = []
     $(catEl).find('.subCategory').each((i, subCatEl) => {
-        const subCategory = {}
-        subCategory.name = $(subCatEl).find('h3').text()
-        subCategory.deals = $(subCatEl).find('.totalNumberOfDeals').text().slice(1, -1)
-        subCategory.path = $(subCatEl).attr('href')
-        subCategoryList.push(subCategory)
+        subCategoryList.push({
+            name: $(subCatEl).find('h3').text(),
+            deals: parseInt($(subCatEl).find('.totalNumberOfDeals').text().slice(1, -1)),
+            path: $(subCatEl).attr('href')
+        })
     })
     return subCategoryList
 }
