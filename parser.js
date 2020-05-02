@@ -4,13 +4,13 @@ const cheerio = require('cheerio')
 
 module.exports = async function (url) {
     try {
-        return await run(url);
+        return await parse(url);
     } catch (e) {
         throw e;
     }
 }
 
-async function run(url) {
+async function parse(url) {
     const page = await getPage(url)
     const categories = getCategories(page)
     return categories;
@@ -21,22 +21,24 @@ function getCategories($) {
     const categoryList = []
     $('#subCategoriesList .subject').each((i, catEl) => {
         const category = {}
-        category.name  = $(catEl).find('.subjectTitle').text()
+        category.name = $(catEl).find('.subjectTitle').text()
         category.path = $(catEl).find('.subjectTitle').attr('href')
-        category.subCategory = []
-
-        $(catEl).find('.subCategory').each((i, subCatEl) => {
-            const subCategory = {}
-            subCategory.name = $(subCatEl).find('h3').text()
-            subCategory.deals = $(subCatEl).find('.totalNumberOfDeals').text().slice(1, -1)
-            subCategory.path = $(subCatEl).attr('href')
-
-            category.subCategory.push(subCategory)
-        })
-
+        category.subCategory = getSubCategories($, catEl)
         categoryList.push(category)
     })
     return categoryList;
+}
+
+function getSubCategories($, catEl) {
+    const subCategoryList = []
+    $(catEl).find('.subCategory').each((i, subCatEl) => {
+        const subCategory = {}
+        subCategory.name = $(subCatEl).find('h3').text()
+        subCategory.deals = $(subCatEl).find('.totalNumberOfDeals').text().slice(1, -1)
+        subCategory.path = $(subCatEl).attr('href')
+        subCategoryList.push(subCategory)
+    })
+    return subCategoryList
 }
 
 async function getPage(url) {
