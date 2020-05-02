@@ -3,23 +3,36 @@ const parser = require('./parser')
 const utils = require('./utils/utils')
 const keys = require('./config/keys')
 
- let cashed = []
+let cashedCategories;
 async function start() {
     try {
-        await mongoose.connect(keys.mongoURL,
+        await mongoose.connect(keys.mongodb,
             { useNewUrlParser: true,  useUnifiedTopology: true, useCreateIndex : true })
             .then(() =>{
-                // TODO load cashed
+                console.log('MongoDB connected')
+                // TODO load cashedCategories
+                cashedCategories = []
             })
-            .catch(error => console.log(`MongoDB connection problem ${error}`))
+            .catch(error =>{
+                console.log(`MongoDB connection problem ${error}`)
+                process.exit(-1)
+            } )
+
 
         const categories = await parser(keys.fullURL());
-        const newestCategories = utils.getNewestCategories(categories, cashed)
+        const newestCategories = utils.getNewestCategories(categories, cashedCategories)
+
+        if(newestCategories) {
+            cashedCategories = newestCategories
+            await utils.saveCategories(newestCategories)
+        }
+
+
     } catch (e) {
-        console.log(e)
+        console.log('Server Error', e.message)
+        process.exit(1)
     }
 
-    process.exit(0);
 }
 
 start()
