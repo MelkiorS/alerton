@@ -6,6 +6,7 @@ module.exports = async function (url) {
     try {
         return await parse(url);
     } catch (e) {
+        console.log('Parser ERROR')
         throw e;
     }
 }
