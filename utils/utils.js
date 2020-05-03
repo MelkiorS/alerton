@@ -1,4 +1,14 @@
 const Category = require('../models/category')
+const nodemailer = require('nodemailer');
+const keys = require('../config/keys')
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: keys.email,
+        pass: keys.emailPwd
+    }
+});
 
 //TODO refactor to atomic operations
 async function saveCategory(category) {
@@ -66,4 +76,32 @@ function getNewestSubCategories(category, cashedCategory) {
         }
     })
     return updatedSubCategory
+}
+
+
+module.exports.notifyAboutNewDeal = function(categories){
+
+    let message = '<h1>new categories</h1>\n'
+    categories.forEach(cat=> {
+        message+= `    <h2>category ${cat.name}</h2>\n`
+        cat.subCategory.forEach(subCat => {
+            message+= `        <h3> sub category ${subCat.name}</h3>\n`
+            message+= `        <a href=" ${keys.baseURL+subCat.path}">NEW : ${subCat.count}</a>\n`
+        })
+    })
+    const mailOptions = {
+        from: keys.email,
+        to: keys.notifyEmail,
+        subject: 'NEW INTERESTS',
+        html: message
+    };
+    console.log(`send email message = \n ${message}`)
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+
 }

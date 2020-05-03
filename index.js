@@ -32,6 +32,7 @@ async function parserLogic() {
         console.log('there is exist newest Categories')
         cashedCategories = newestCategories
         await utils.saveCategories(newestCategories)
+        utils.notifyAboutNewDeal(newestCategories)
     } else {
         console.log('NO newest Categories ')
     }
