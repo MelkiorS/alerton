@@ -13,7 +13,11 @@ const Schema = mongoose.Schema
     path: {
         type: String,
         required: true,
-    }
+    },
+     count: {
+        type: Number,
+         required: false
+     }
 
 })
 

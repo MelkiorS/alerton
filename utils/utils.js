@@ -1,16 +1,33 @@
 const Category = require('../models/category')
 
-async function saveCategories(category) {
+//TODO refactor to atomic operations
+async function saveCategory(category) {
+    const query = {name:category.name}
+    const update = { subCategory: category.subCategory }
+    const options = { upsert: true, new: true };
     try {
-        await new Category(category).save()
+    await Category.findOneAndUpdate(query, update, options,
+        function (err, doc) {
+        if(err) throw err
+        if(!doc){
+            doc = new Category(category)
+            doc.save()
+        }})
     } catch (e) {
-        throw new Error(`Save Category error = ${e}`)
+        throw new Error(`Load Category error = ${e}`)
     }
+}
 
+module.exports.loadCategories = async function () {
+    try {
+        return await Category.find()
+    } catch (e) {
+            throw new Error(`Load Category error = ${e}`)
+    }
 }
 
 module.exports.saveCategories = async function (categoryList) {
-    categoryList.forEach(cat => saveCategories(cat))
+    categoryList.forEach(cat => saveCategory(cat))
 }
 
 module.exports.getNewestCategories = function (categories, cashed) {
@@ -19,7 +36,7 @@ module.exports.getNewestCategories = function (categories, cashed) {
         const cashedCategory = cashed.find(c => c.name === cat.name)
         if (cashedCategory) {
             const updatedSubCat = getNewestSubCategories(cat, cashedCategory)
-            if (updatedSubCat) {
+            if (updatedSubCat.length) {
                 const updatedCat = {
                     name: cat.name,
                     path: cat.path,
@@ -39,8 +56,9 @@ function getNewestSubCategories(category, cashedCategory) {
     category.subCategory.forEach(subCat => {
         const cashedSubCat = cashedCategory.subCategory.find(sc => sc.name === subCat.name)
         if (cashedSubCat) {
-            const isUpdated = subCat.deals < cashedSubCat.deals
+            const isUpdated = subCat.deals > cashedSubCat.deals
             if (isUpdated) {
+                subCat.count = subCat.deals - cashedSubCat.deals
                 updatedSubCategory.push(subCat)
             }
         } else {
