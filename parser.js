@@ -43,14 +43,21 @@ function getSubCategories($, catEl) {
 }
 
 async function getPage(url) {
-
-    return await axios.get(url,
+try {
+    const resp = await axios.get(url,
         {
             headers: {
                 'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
                 'content-type': 'text/html; charset=UTF-8',
                 'content-language': 'he',
             }
-        }
-    ).then(resp => cheerio.load(resp.data, {decodeEntities: false}))
+        })
+    console.log(`Page load successfully from ${url}`)
+    return  await cheerio.load(resp.data, {decodeEntities: false})
+} catch (e) {
+    console.log(`Filed load page from ${url}`)
+    throw new Error(e)
+}
+
+
 }
