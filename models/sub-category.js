@@ -16,7 +16,7 @@ const Schema = mongoose.Schema
     },
      count: {
         type: Number,
-         required: false
+         required: true
      }
 
 })

@@ -55,6 +55,7 @@ module.exports.getNewestCategories = function (categories, cashed) {
                 updated.push(updatedCat)
             }
         } else {
+            cat.subCategory.forEach(subCat=>subCat.count = subCat.deals)
             updated.push(cat)
         }
     })
@@ -66,12 +67,14 @@ function getNewestSubCategories(category, cashedCategory) {
     category.subCategory.forEach(subCat => {
         const cashedSubCat = cashedCategory.subCategory.find(sc => sc.name === subCat.name)
         if (cashedSubCat) {
-            const isUpdated = subCat.deals > cashedSubCat.deals
-            if (isUpdated) {
+            if (subCat.deals > cashedSubCat.deals) {
                 subCat.count = subCat.deals - cashedSubCat.deals
                 updatedSubCategory.push(subCat)
+            } else if (subCat.deals < cashedSubCat.deals){
+
             }
         } else {
+            subCat.count = subCat.deals
             updatedSubCategory.push(subCat)
         }
     })
