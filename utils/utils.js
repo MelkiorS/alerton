@@ -124,25 +124,28 @@ module.exports.notifyAboutNewDeal = function (categories) {
         subject: 'NEW INTERESTS',
         html: message
     };
-    console.log(`send email message = \n ${message}`)
-    /*    transporter.sendMail(mailOptions, function (error, info) {
+    // console.log(`send email message = \n ${message}`)
+        transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
             } else {
                 console.log('Email sent: ' + info.response);
             }
-        });*/
+        });
 }
 
 module.exports.translateCategories = function (categories, dictionary) {
     const lang = dictionary.translator
     const translated = []
     categories.forEach(c => translated.push({...c}))
+
     translated.forEach(cat => {
-        cat.name = lang.get(cat.name)
+        cat.name = lang.get(cat.name.split('.').join('DOT'))
+        const subCatTrans = []
         cat.subCategory.forEach(subCat => {
-            subCat.name = lang.get(subCat.name)
+            subCatTrans.push({...subCat, name: lang.get(subCat.name.split('.').join('DOT'))})
         })
+        cat.subCategory = subCatTrans
     })
 
     return translated
