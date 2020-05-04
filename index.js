@@ -5,6 +5,7 @@ const keys = require('./config/keys')
 const cron = require('node-cron')
 
 let cacheCategories;
+let dictionary;
 
 async function start() {
     try {
@@ -30,7 +31,10 @@ async function parserLogic() {
 
     if (newest.length) {
         console.log('there is newest Categories')
-        utils.notifyAboutNewDeal(newest)
+        await  utils.getNewTranslations(newest, dictionary)
+        await utils.saveDictionary(dictionary)
+        const translatedNewest = utils.translateCategories(newest, dictionary)
+        utils.notifyAboutNewDeal(translatedNewest)
     }
 
     if (allChanged.length) {
@@ -45,6 +49,7 @@ async function initialization() {
     await mongoose.connect(keys.mongodb,
         {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false})
     cacheCategories = await utils.loadCategories()
+    dictionary = await  utils.loadDictionary()
     await parserLogic()
 }
 
