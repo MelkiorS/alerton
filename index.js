@@ -4,7 +4,7 @@ const utils = require('./utils/utils')
 const keys = require('./config/keys')
 const cron = require('node-cron')
 
-let cashedCategories;
+let cacheCategories;
 
 async function start() {
     try {
@@ -16,7 +16,7 @@ async function start() {
             setTimeout(()=> parserLogic(), delay)
         }, {scheduled: true});
     } catch (e) {
-        console.log('Server Error', e.message)
+        console.log('Server Error =>', e.message)
         process.exit(1)
     }
 
@@ -26,22 +26,25 @@ async function parserLogic() {
     console.log(`start parserLogic at ${new Date()}`);
 
     const categories = await parser(keys.fullURL());
-    const newestCategories = utils.getNewestCategories(categories, cashedCategories)
+    const {newest, allChanged} = utils.checkCategories(categories, cacheCategories)
 
-    if (newestCategories.length) {
-        console.log('there is exist newest Categories')
-        cashedCategories = newestCategories
-        await utils.saveCategories(newestCategories)
-        // utils.notifyAboutNewDeal(newestCategories)
-    } else {
-        console.log('NO newest Categories ')
+    if (newest.length) {
+        console.log('there is newest Categories')
+        utils.notifyAboutNewDeal(newest)
     }
+
+    if (allChanged.length) {
+        cacheCategories = allChanged
+        await utils.saveCategories(cacheCategories)
+
+    }
+
 }
 
 async function initialization() {
     await mongoose.connect(keys.mongodb,
         {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false})
-    cashedCategories = await utils.loadCategories()
+    cacheCategories = await utils.loadCategories()
     await parserLogic()
 }
 

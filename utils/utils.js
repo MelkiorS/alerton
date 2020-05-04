@@ -43,24 +43,26 @@ module.exports.saveCategories = async function (categoryList) {
 
 module.exports.checkCategories = function (categories, cashed) {
     const newest = []
-    const changedCount = []
+    const allChanged = []
     categories.forEach(cat => {
         const cashedCategory = cashed.find(c => c.name === cat.name)
         if (cashedCategory) {
-            const checkedSubCategories = checkSubCategories(cat, cashedCategory)
-            if (checkedSubCategories.newest.length) {
-                const updatedCat = getUpdatedCat(cat, checkedSubCategories.newest)
+            const {newestSubCat, allChangedSubCat} = checkSubCategories(cat, cashedCategory)
+            if (newestSubCat.length) {
+                const updatedCat = getUpdatedCat(cat, newestSubCat)
                 newest.push(updatedCat)
-            } else if (checkedSubCategories.changedCount.length) {
-                const updatedCat = getUpdatedCat(cat, checkedSubCategories.changedCount)
-                changedCount.push(updatedCat)
+                allChanged.push(updatedCat)
+            } else if (allChangedSubCat.length) {
+                const updatedCat = getUpdatedCat(cat, allChangedSubCat)
+                allChanged.push(updatedCat)
             }
         } else {
             cat.subCategory.forEach(subCat => subCat.count = subCat.deals)
             newest.push(cat)
+            allChanged.push(cat)
         }
     })
-    return {newest, changedCount}
+    return {newest, allChanged}
 }
 
 function getUpdatedCat(cat, subCats) {
@@ -73,24 +75,26 @@ function getUpdatedCat(cat, subCats) {
 }
 
 function checkSubCategories(category, cashedCategory) {
-    const newest = []
-    const changedCount = []
+    const newestSubCat = []
+    const allChangedSubCat = []
     category.subCategory.forEach(subCat => {
         const cashedSubCat = cashedCategory.subCategory.find(sc => sc.name === subCat.name)
         if (cashedSubCat) {
             if (subCat.deals > cashedSubCat.deals) {
                 subCat.count = subCat.deals - cashedSubCat.deals
-                newest.push(subCat)
+                newestSubCat.push(subCat)
+                allChangedSubCat.push(subCat)
             } else if (subCat.deals < cashedSubCat.deals) {
                 subCat.count = subCat.deals
-                changedCount.push(subCat)
+                allChangedSubCat.push(subCat)
             }
         } else {
             subCat.count = subCat.deals
-            newest.push(subCat)
+            newestSubCat.push(subCat)
+            allChangedSubCat.push(subCat)
         }
     })
-    return {newest, changedCount}
+    return {newestSubCat, allChangedSubCat}
 }
 
 
