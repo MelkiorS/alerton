@@ -12,17 +12,18 @@ const transporter = nodemailer.createTransport({
 
 //TODO refactor to atomic operations
 async function saveCategory(category) {
-    const query = {name:category.name}
-    const update = { subCategory: category.subCategory }
-    const options = { upsert: true, new: true };
+    const query = {name: category.name}
+    const update = {subCategory: category.subCategory}
+    const options = {upsert: true, new: true};
     try {
-    await Category.findOneAndUpdate(query, update, options,
-        function (err, doc) {
-        if(err) throw err
-        if(!doc){
-            doc = new Category(category)
-            doc.save()
-        }})
+        await Category.findOneAndUpdate(query, update, options,
+            function (err, doc) {
+                if (err) throw err
+                if (!doc) {
+                    doc = new Category(category)
+                    doc.save()
+                }
+            })
     } catch (e) {
         throw new Error(`Load Category error = ${e}`)
     }
@@ -32,7 +33,7 @@ module.exports.loadCategories = async function () {
     try {
         return await Category.find()
     } catch (e) {
-            throw new Error(`Load Category error = ${e}`)
+        throw new Error(`Load Category error = ${e}`)
     }
 }
 
@@ -48,26 +49,27 @@ module.exports.checkCategories = function (categories, cashed) {
         if (cashedCategory) {
             const checkedSubCategories = checkSubCategories(cat, cashedCategory)
             if (checkedSubCategories.newest.length) {
-                const updatedCat = {
-                    name: cat.name,
-                    path: cat.path,
-                    subCategory: checkedSubCategories.newest
-                }
+                const updatedCat = getUpdatedCat(cat, checkedSubCategories.newest)
                 newest.push(updatedCat)
-            } else if (checkedSubCategories.changedCount.length){
-                const updatedCat = {
-                    name: cat.name,
-                    path: cat.path,
-                    subCategory: checkedSubCategories.changedCount
-                }
+            } else if (checkedSubCategories.changedCount.length) {
+                const updatedCat = getUpdatedCat(cat, checkedSubCategories.changedCount)
                 changedCount.push(updatedCat)
             }
         } else {
-            cat.subCategory.forEach(subCat=>subCat.count = subCat.deals)
+            cat.subCategory.forEach(subCat => subCat.count = subCat.deals)
             newest.push(cat)
         }
     })
     return {newest, changedCount}
+}
+
+function getUpdatedCat(cat, subCats) {
+    return {
+        name: cat.name,
+        path: cat.path,
+        subCategory: subCats
+    }
+
 }
 
 function checkSubCategories(category, cashedCategory) {
@@ -79,7 +81,7 @@ function checkSubCategories(category, cashedCategory) {
             if (subCat.deals > cashedSubCat.deals) {
                 subCat.count = subCat.deals - cashedSubCat.deals
                 newest.push(subCat)
-            } else if (subCat.deals < cashedSubCat.deals){
+            } else if (subCat.deals < cashedSubCat.deals) {
                 subCat.count = subCat.deals
                 changedCount.push(subCat)
             }
@@ -88,19 +90,18 @@ function checkSubCategories(category, cashedCategory) {
             newest.push(subCat)
         }
     })
-
     return {newest, changedCount}
 }
 
 
-module.exports.notifyAboutNewDeal = function(categories){
+module.exports.notifyAboutNewDeal = function (categories) {
 
     let message = '<h1>new categories</h1>\n'
-    categories.forEach(cat=> {
-        message+= `    <h2>category ${cat.name}</h2>\n`
+    categories.forEach(cat => {
+        message += `    <h2>category ${cat.name}</h2>\n`
         cat.subCategory.forEach(subCat => {
-            message+= `        <h3> sub category ${subCat.name}</h3>\n`
-            message+= `        <a href=" ${keys.baseURL+subCat.path}">NEW : ${subCat.count}</a>\n`
+            message += `        <h3> sub category ${subCat.name}</h3>\n`
+            message += `        <a href=" ${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
         })
     })
     const mailOptions = {
@@ -110,7 +111,7 @@ module.exports.notifyAboutNewDeal = function(categories){
         html: message
     };
     console.log(`send email message = \n ${message}`)
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
         } else {
