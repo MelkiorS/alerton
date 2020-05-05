@@ -16,14 +16,12 @@ async function start() {
     try {
         await initialization()
         cron.schedule(` */${keys.wakeUpPeriod} * * * *`,()=>{
-            console.log('Send wake UP request')
             utils.wakeUp()
         },{scheduled: true})
 
         cron.schedule(` */${keys.checkMinutes} * * * *`, () => {
             const random = Math.floor(Math.random() * Math.floor(keys.checkMinutes - 1))
             const delay = random * 60000
-            console.log(`delay = ${random} date ${new Date()}`);
             setTimeout(()=> parserLogic(), delay)
         }, {scheduled: true});
     } catch (e) {
@@ -34,7 +32,7 @@ async function start() {
 }
 
 async function parserLogic() {
-    console.log(`start parserLogic at ${new Date()}`);
+    console.log(`start parserLogic`);
 
     const categories = await parser(keys.fullURL());
     const {newestCat, allChangedCat} = utils.checkCategories(categories, cacheCategories)

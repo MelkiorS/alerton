@@ -85,8 +85,8 @@ function getUpdatedCat(cat, subCategory) {
     return {...cat, subCategory}
 }
 
-function getUpdatedSubCat(subCat,count) {
-    return {...subCat,count}
+function getUpdatedSubCat(subCat, count) {
+    return {...subCat, count}
 }
 
 function checkSubCategories(subCategory, cashedSubCategory) {
@@ -113,11 +113,11 @@ function checkSubCategories(subCategory, cashedSubCategory) {
     return {newestSubCat, allChangedSubCat}
 }
 
-module.exports.updateCacheCategories = function(cachedCategories,categories){
+module.exports.updateCacheCategories = function (cachedCategories, categories) {
     categories.forEach(cat => {
         const cashedCat = cachedCategories.find(c => c.name === cat.name)
         if (cashedCat) {
-            cat.subCategory.forEach(subCat=>{
+            cat.subCategory.forEach(subCat => {
                 const cashedSubCat = cashedCat.subCategory.find(sc => sc.name === subCat.name)
                 if (cashedSubCat) {
                     Object.assign(cashedSubCat, subCat);
@@ -239,19 +239,18 @@ async function translateText(text) {
     }
 }
 
-module.exports.wakeUp = function(){
-    try {
-        axios.get(keys.wakeUpUrl,
-            {
-                headers: {
-                    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-                    'content-type': 'text/html; charset=UTF-8',
-                    'content-language': 'he',
-                }
-            })
+//Need this bs for proper work heroku serverside oriented app
+module.exports.wakeUp = function () {
+    console.log('Send wake UP request')
+    axios.get(keys.wakeUpUrl,
+        {
+            headers: {
+                'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+                'content-type': 'text/html; charset=UTF-8',
+                'content-language': 'en',
+            }
+        })
+        .then(ignore => ignore)
+        .catch(ignore => ignore)
 
-    } catch (e) {
-        console.log(`Filed wakeUp request`)
-        throw new Error(e)
-    }
 }
