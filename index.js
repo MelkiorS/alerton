@@ -4,6 +4,11 @@ const utils = require('./utils/utils')
 const keys = require('./config/keys')
 const cron = require('node-cron')
 
+const express = require('express')
+const app = express()
+app.use(express.json())
+const PORT = process.env.PORT || 3000
+
 let cacheCategories;
 let cacheDictionary;
 
@@ -55,4 +60,8 @@ async function initialization() {
     await parserLogic()
 }
 
-start()
+
+app.listen(PORT, () => {
+        console.log(`App has been started on port ${PORT} in ${process.env.NODE_ENV} mode`)
+    start().then(resp=>console.log(`start resp = ${resp}`))
+});
