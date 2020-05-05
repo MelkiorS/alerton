@@ -15,11 +15,11 @@ let cacheDictionary;
 async function start() {
     try {
         await initialization()
-        cron.schedule(` */${keys.wakeUpPeriod} * * * *`,()=>{
+        cron.schedule(` */${keys.wakeUpPeriod} 3-20 * * *`,()=>{
             utils.wakeUp()
         },{scheduled: true})
 
-        cron.schedule(` */${keys.checkMinutes} * * * *`, () => {
+        cron.schedule(` */${keys.checkMinutes} 4-20 * * *`, () => {
             const random = Math.floor(Math.random() * Math.floor(keys.checkMinutes - 1))
             const delay = random * 60000
             setTimeout(()=> parserLogic(), delay)
