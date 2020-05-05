@@ -1,15 +1,15 @@
 {
-  "name": "parser",
+  "name": "alerton",
   "version": "1.0.0",
   "description": "web parser",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon index",
+    "server": "nodemon index.js",
     "start": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MelkiorS/parser.git"
+    "url": "git+https://github.com/MelkiorS/alerton.git"
   },
   "keywords": [
     "node"
@@ -17,9 +17,9 @@
   "author": "andrey.volovod <andrey.volovod@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MelkiorS/parser/issues"
+    "url": "https://github.com/MelkiorS/alerton/issues"
   },
-  "homepage": "https://github.com/MelkiorS/parser#readme",
+  "homepage": "https://github.com/MelkiorS/alerton#readme",
   "dependencies": {
     "@vitalets/google-translate-api": "^3.0.0",
     "axios": "^0.19.2",
