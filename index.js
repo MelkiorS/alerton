@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const parser = require('./parser')
+const cacheCtrl = require('./controllers/cache')
 const utils = require('./utils/utils')
 const keys = require('./config/keys')
 const cron = require('node-cron')
@@ -9,8 +10,9 @@ const app = express()
 app.use(express.json())
 const PORT = process.env.PORT || 3000
 
+/*let cache
 let cacheCategories;
-let cacheDictionary;
+let cacheDictionary;*/
 
 async function start() {
     try {
@@ -32,22 +34,22 @@ async function parserLogic() {
     console.log(`start parserLogic at ${new Date()}`);
 
     const categories = await parser(keys.fullURL());
-    const {newestCat, allChangedCat} = utils.checkCategories(categories, cacheCategories)
+    const {newestCat, allChangedCat} = utils.checkCategories(categories)
 
     if (newestCat.length) {
         console.log('there is newest Categories')
-        await utils.updateDictionary(newestCat, cacheDictionary)
-        await utils.saveDictionary(cacheDictionary)
-        const translatedNewest = utils.translateCategories(newestCat, cacheDictionary)
-        utils.notifyAboutNewDeal(translatedNewest)
+        // await utils.updateDictionary(newestCat, cacheDictionary)
+        // await utils.saveDictionary(cacheDictionary)
+        // const translatedNewest = utils.translateCategories(newestCat, cacheDictionary)
+        // utils.notifyAboutNewDeal(translatedNewest)
     } else {
         console.log('No newest Categories')
     }
 
     if (allChangedCat.length) {
         console.log(`there is ChangedCat ${JSON.stringify(allChangedCat)}`)
-        utils.updateCacheCategories(cacheCategories, allChangedCat);
-        await utils.saveCategories(cacheCategories)
+        // utils.updateCacheCategories(cacheCategories, allChangedCat);
+        // await utils.saveCategories(cacheCategories)
     }
 
 }
@@ -55,8 +57,10 @@ async function parserLogic() {
 async function initialization() {
     await mongoose.connect(keys.mongodb,
         {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false})
-    cacheCategories = await utils.loadCategories()
-    cacheDictionary = await  utils.loadDictionary()
+/*    cacheCategories = await utils.loadCategories()
+    cacheDictionary = await  utils.loadDictionary()*/
+    await cacheCtrl.init()
+
     await parserLogic()
 }
 

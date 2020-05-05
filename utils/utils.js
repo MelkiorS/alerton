@@ -3,6 +3,7 @@ const Dictionary = require('../models/dictionary')
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys')
 const translate = require('@vitalets/google-translate-api');
+const cacheCtrl = require('../controllers/cache')
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -51,7 +52,8 @@ module.exports.saveCategories = async function (categoryList) {
     categoryList.forEach(cat => saveCategory(cat))
 }
 
-module.exports.checkCategories = function (categories, cashed) {
+module.exports.checkCategories = function (categories) {
+    const cashed = cacheCtrl.cacheCategories()
     const newestCat = []
     const allChangedCat = []
     categories.forEach(cat => {
