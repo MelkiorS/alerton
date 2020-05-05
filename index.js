@@ -5,7 +5,7 @@ const keys = require('./config/keys')
 const cron = require('node-cron')
 
 let cacheCategories;
-let dictionary;
+let cacheDictionary;
 
 async function start() {
     try {
@@ -27,20 +27,22 @@ async function parserLogic() {
     console.log(`start parserLogic at ${new Date()}`);
 
     const categories = await parser(keys.fullURL());
-    const {newest, allChanged} = utils.checkCategories(categories, cacheCategories)
+    const {newestCat, allChangedCat} = utils.checkCategories(categories, cacheCategories)
 
-    if (newest.length) {
+    if (newestCat.length) {
         console.log('there is newest Categories')
-        await  utils.getNewTranslations(newest, dictionary)
-        await utils.saveDictionary(dictionary)
-        const translatedNewest = utils.translateCategories(newest, dictionary)
+        await utils.updateDictionary(newestCat, cacheDictionary)
+        await utils.saveDictionary(cacheDictionary)
+        const translatedNewest = utils.translateCategories(newestCat, cacheDictionary)
         utils.notifyAboutNewDeal(translatedNewest)
+    } else {
+        console.log('No newest Categories')
     }
 
-    if (allChanged.length) {
-        cacheCategories = allChanged
+    if (allChangedCat.length) {
+        console.log('there is ChangedCat')
+        utils.updateCacheCategories(cacheCategories, allChangedCat);
         await utils.saveCategories(cacheCategories)
-
     }
 
 }
@@ -49,7 +51,7 @@ async function initialization() {
     await mongoose.connect(keys.mongodb,
         {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false})
     cacheCategories = await utils.loadCategories()
-    dictionary = await  utils.loadDictionary()
+    cacheDictionary = await  utils.loadDictionary()
     await parserLogic()
 }
 

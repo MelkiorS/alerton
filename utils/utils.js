@@ -18,7 +18,7 @@ async function saveCategory(category) {
     const update = {subCategory: category.subCategory}
     const options = {upsert: true, new: true};
     try {
-        await Category.findOneAndUpdate(query, update, options,
+        return await Category.findOneAndUpdate(query, update, options,
             function (err, doc) {
                 if (err) throw err
                 if (!doc) {
@@ -52,61 +52,87 @@ module.exports.saveCategories = async function (categoryList) {
 }
 
 module.exports.checkCategories = function (categories, cashed) {
-    const newest = []
-    const allChanged = []
+    const newestCat = []
+    const allChangedCat = []
     categories.forEach(cat => {
         const cashedCategory = cashed.find(c => c.name === cat.name)
         if (cashedCategory) {
-            const {newestSubCat, allChangedSubCat} = checkSubCategories(cat, cashedCategory)
+            const {newestSubCat, allChangedSubCat} =
+                checkSubCategories(cat.subCategory, cashedCategory.subCategory)
+
             if (newestSubCat.length) {
                 const updatedCat = getUpdatedCat(cat, newestSubCat)
-                newest.push(updatedCat)
-                allChanged.push(updatedCat)
-            } else if (allChangedSubCat.length) {
+                newestCat.push(updatedCat)
+                allChangedCat.push(updatedCat)
+            }
+            if (allChangedSubCat.length) {
                 const updatedCat = getUpdatedCat(cat, allChangedSubCat)
-                allChanged.push(updatedCat)
+                allChangedCat.push(updatedCat)
             }
         } else {
-            cat.subCategory.forEach(subCat => subCat.count = subCat.deals)
-            newest.push(cat)
-            allChanged.push(cat)
+            const {newestSubCat} =
+                checkSubCategories(cat.subCategory, [])
+            const updatedCat = getUpdatedCat(cat, newestSubCat)
+            newestCat.push(updatedCat)
+            allChangedCat.push(updatedCat)
         }
     })
-    return {newest, allChanged}
+    return {newestCat, allChangedCat}
 }
 
-function getUpdatedCat(cat, subCats) {
-    return {
-        name: cat.name,
-        path: cat.path,
-        subCategory: subCats
-    }
-
+function getUpdatedCat(cat, subCategory) {
+    return {...cat, subCategory}
 }
 
-function checkSubCategories(category, cashedCategory) {
+function getUpdatedSubCat(subCat,count) {
+    return {...subCat,count}
+}
+
+function checkSubCategories(subCategory, cashedSubCategory) {
     const newestSubCat = []
     const allChangedSubCat = []
-    category.subCategory.forEach(subCat => {
-        const cashedSubCat = cashedCategory.subCategory.find(sc => sc.name === subCat.name)
+    subCategory.forEach(subCat => {
+        const cashedSubCat = cashedSubCategory.find(sc => sc.name === subCat.name)
         if (cashedSubCat) {
             if (subCat.deals > cashedSubCat.deals) {
-                subCat.count = subCat.deals - cashedSubCat.deals
-                newestSubCat.push(subCat)
-                allChangedSubCat.push(subCat)
+                const count = subCat.deals - cashedSubCat.deals
+                const updatedSubCat = getUpdatedSubCat(subCat, count)
+                newestSubCat.push(updatedSubCat)
+                allChangedSubCat.push(updatedSubCat)
             } else if (subCat.deals < cashedSubCat.deals) {
-                subCat.count = subCat.deals
-                allChangedSubCat.push(subCat)
+                const updatedSubCat = getUpdatedSubCat(subCat, subCat.deals)
+                allChangedSubCat.push(updatedSubCat)
             }
         } else {
-            subCat.count = subCat.deals
-            newestSubCat.push(subCat)
-            allChangedSubCat.push(subCat)
+            const updatedSubCat = getUpdatedSubCat(subCat, subCat.deals)
+            newestSubCat.push(updatedSubCat)
+            allChangedSubCat.push(updatedSubCat)
         }
     })
     return {newestSubCat, allChangedSubCat}
 }
 
+module.exports.updateCacheCategories = function(cachedCategories,categories){
+    categories.forEach(cat => {
+        const cashedCat = cachedCategories.find(c => c.name === cat.name)
+        if (cashedCat) {
+            cat.subCategory.forEach(subCat=>{
+                const cashedSubCat = cashedCat.subCategory.find(sc => sc.name === subCat.name)
+                if (cashedSubCat) {
+                    Object.assign(cashedSubCat, subCat);
+                } else {
+                    const updatedSubCat = getUpdatedSubCat(subCat, subCat.deals)
+                    cashedCat.subCategory.push(updatedSubCat)
+                }
+            })
+
+        } else {
+            const {allChangedSubCat} = checkSubCategories(cat.subCategory, [])
+            const updatedCat = getUpdatedCat(cat, allChangedSubCat)
+            cachedCategories.push(updatedCat)
+        }
+    })
+}
 
 module.exports.notifyAboutNewDeal = function (categories) {
 
@@ -124,14 +150,14 @@ module.exports.notifyAboutNewDeal = function (categories) {
         subject: 'NEW INTERESTS',
         html: message
     };
-    // console.log(`send email message = \n ${message}`)
-        transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
+    console.log(`send email message = \n ${message}`)
+/*    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });*/
 }
 
 module.exports.translateCategories = function (categories, dictionary) {
@@ -151,7 +177,7 @@ module.exports.translateCategories = function (categories, dictionary) {
     return translated
 }
 
-module.exports.saveDictionary = function(dictionary) {
+module.exports.saveDictionary = function (dictionary) {
     const query = {lang: 'he'}
     const update = {translator: dictionary.translator}
     const options = {upsert: true, new: true};
@@ -170,7 +196,7 @@ module.exports.saveDictionary = function(dictionary) {
 
 }
 
-module.exports.getNewTranslations = async function (categories, dictionary) {
+module.exports.updateDictionary = async function (categories, dictionary) {
     const lang = dictionary.translator
     for (let i = 0; i < categories.length; i++) {
         const catName = categories[i].name

@@ -2,7 +2,7 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 
 
-module.exports = async function (url) {
+module.exports = async function(url) {
     try {
         return await parse(url);
     } catch (e) {
@@ -13,8 +13,7 @@ module.exports = async function (url) {
 
 async function parse(url) {
     const page = await getPage(url)
-    const categories = getCategories(page)
-    return categories;
+    return getCategories(page)
 }
 
 
