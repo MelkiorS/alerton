@@ -3,6 +3,7 @@ const Dictionary = require('../models/dictionary')
 const nodemailer = require('nodemailer');
 const keys = require('../config/keys')
 const translate = require('@vitalets/google-translate-api');
+const axios = require('axios')
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -235,5 +236,22 @@ async function translateText(text) {
     } catch (e) {
         console.log(e)
         throw new e
+    }
+}
+
+module.exports.wakeUp = function(){
+    try {
+        axios.get(keys.wakeUpUrl,
+            {
+                headers: {
+                    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+                    'content-type': 'text/html; charset=UTF-8',
+                    'content-language': 'he',
+                }
+            })
+
+    } catch (e) {
+        console.log(`Filed wakeUp request`)
+        throw new Error(e)
     }
 }

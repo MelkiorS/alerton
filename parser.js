@@ -51,7 +51,7 @@ try {
                 'content-language': 'he',
             }
         })
-    console.log(`Page load successfully from ${url}`)
+    console.log(`Page load successfully`)
     return  await cheerio.load(resp.data, {decodeEntities: false})
 } catch (e) {
     console.log(`Filed load page from ${url}`)

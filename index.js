@@ -15,6 +15,11 @@ let cacheDictionary;
 async function start() {
     try {
         await initialization()
+        cron.schedule(` */${keys.wakeUpPeriod} * * * *`,()=>{
+            console.log('Send wake UP request')
+            utils.wakeUp()
+        },{scheduled: true})
+
         cron.schedule(` */${keys.checkMinutes} * * * *`, () => {
             const random = Math.floor(Math.random() * Math.floor(keys.checkMinutes - 1))
             const delay = random * 60000

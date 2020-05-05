@@ -9,4 +9,6 @@ module.exports = {
     email: process.env.EMAIL,
     emailPwd: process.env.EMAIL_PWD,
     notifyEmail: process.env.NOTIFY_EMAIL,
+    wakeUpUrl: process.env.WAKE_UP_URL,
+    wakeUpPeriod: process.env.WAKE_UP_PERIOD,
 }
