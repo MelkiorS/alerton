@@ -150,14 +150,14 @@ module.exports.notifyAboutNewDeal = function (categories) {
         subject: 'NEW INTERESTS',
         html: message
     };
-    console.log(`send email message = \n ${message}`)
-/*    transporter.sendMail(mailOptions, function (error, info) {
+    // console.log(`send email message = \n ${message}`)
+    transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
         } else {
             console.log('Email sent: ' + info.response);
         }
-    });*/
+    });
 }
 
 module.exports.translateCategories = function (categories, dictionary) {
