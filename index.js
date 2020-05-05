@@ -40,7 +40,7 @@ async function parserLogic() {
     }
 
     if (allChangedCat.length) {
-        console.log('there is ChangedCat')
+        console.log(`there is ChangedCat ${JSON.stringify(allChangedCat)}`)
         utils.updateCacheCategories(cacheCategories, allChangedCat);
         await utils.saveCategories(cacheCategories)
     }
