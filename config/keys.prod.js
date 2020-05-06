@@ -11,4 +11,6 @@ module.exports = {
     notifyEmail: process.env.NOTIFY_EMAIL,
     wakeUpUrl: process.env.WAKE_UP_URL,
     wakeUpPeriod: process.env.WAKE_UP_PERIOD,
+    botToken: process.env.BOT_TOKEN,
+    botMsgId: process.env.BOT_MSG_ID
 }
