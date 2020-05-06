@@ -15,7 +15,7 @@ let cacheDictionary;
 async function start() {
     try {
         await initialization()
-        cron.schedule(` */${keys.wakeUpPeriod} 3-20 * * *`,()=>{
+        cron.schedule(` */${keys.wakeUpPeriod} * * * *`,()=>{
             utils.wakeUp()
         },{scheduled: true})
 
