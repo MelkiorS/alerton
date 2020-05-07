@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const keys = require('../config/keys')
 const translate = require('@vitalets/google-translate-api');
 const axios = require('axios')
+const bot  = require('./controllers/telegram-bot')
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -170,9 +171,11 @@ function notifyByTelegram(categories) {
             message += `        <a href=" ${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
         })
     })
-    bot.sendMessage(keys.botMsgId, message, {parse_mode: 'HTML'})
-        .then(ignore => ignore )
-        .catch(e => console.log(`notifyByTelegram error ${e}`))
+    try{
+        const ignore = bot.sendMessage(keys.botMsgId, message, {parse_mode: 'HTML'})
+    } catch (e) {
+        console.log(`notifyByTelegram error ${e}`)
+    }
 }
 
 module.exports.notifyAboutNewDeal = function (categories) {

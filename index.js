@@ -3,7 +3,7 @@ const parser = require('./parser')
 const utils = require('./utils/utils')
 const keys = require('./config/keys')
 const cron = require('node-cron')
-const bot  = require('./controllers/telegram-bot')
+
 
 const express = require('express')
 const app = express()
