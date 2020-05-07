@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const keys = require('../config/keys')
 const translate = require('@vitalets/google-translate-api');
 const axios = require('axios')
-const bot  = require('./controllers/telegram-bot')
+const bot  = require('../controllers/telegram-bot')
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
