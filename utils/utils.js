@@ -135,7 +135,7 @@ module.exports.updateCacheCategories = function (cachedCategories, categories) {
     })
 }
 
-function notifyByEmail(categories){
+function notifyByEmail(categories) {
     let message = '<h1>categories:</h1>\n'
     categories.forEach(cat => {
         message += `    <h2>${cat.name}</h2>\n`
@@ -161,7 +161,7 @@ function notifyByEmail(categories){
 
 }
 
-function notifyByTelegram(categories){
+function notifyByTelegram(categories) {
     let message = ''
     categories.forEach(cat => {
         message += `    <i>${cat.name}</i>\n`
@@ -170,8 +170,9 @@ function notifyByTelegram(categories){
             message += `        <a href=" ${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
         })
     })
-        bot.sendMessage(keys.botMsgId,message, {parse_mode : 'HTML'})
-            .catch(e=> console.log(`notifyByTelegram error ${e}`))
+    bot.sendMessage(keys.botMsgId, message, {parse_mode: 'HTML'})
+        .then(ignore => ignore )
+        .catch(e => console.log(`notifyByTelegram error ${e}`))
 }
 
 module.exports.notifyAboutNewDeal = function (categories) {
