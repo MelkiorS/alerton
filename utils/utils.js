@@ -170,12 +170,8 @@ function notifyByTelegram(categories){
             message += `        <a href=" ${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
         })
     })
-
-    try{
         bot.sendMessage(keys.botMsgId,message, {parse_mode : 'HTML'})
-    } catch (e) {
-        console.log(`notifyByTelegram error ${e}`)
-    }
+            .catch(e=> console.log(`notifyByTelegram error ${e}`))
 }
 
 module.exports.notifyAboutNewDeal = function (categories) {
