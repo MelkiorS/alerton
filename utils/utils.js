@@ -135,8 +135,7 @@ module.exports.updateCacheCategories = function (cachedCategories, categories) {
     })
 }
 
-module.exports.notifyAboutNewDeal = function (categories) {
-
+function notifyByEmail(categories){
     let message = '<h1>categories:</h1>\n'
     categories.forEach(cat => {
         message += `    <h2>${cat.name}</h2>\n`
@@ -159,6 +158,30 @@ module.exports.notifyAboutNewDeal = function (categories) {
             console.log('Email sent: ' + info.response);
         }
     });
+
+}
+
+function notifyByTelegram(categories){
+    let message = ''
+    categories.forEach(cat => {
+        message += `    <i>${cat.name}</i>\n`
+        cat.subCategory.forEach(subCat => {
+            message += `        <b>${subCat.name}</b>\n`
+            message += `        <a href=" ${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
+        })
+    })
+
+    try{
+        bot.sendMessage(keys.botMsgId,message, {parse_mode : 'HTML'})
+    } catch (e) {
+        console.log(`notifyByTelegram error ${e}`)
+    }
+}
+
+module.exports.notifyAboutNewDeal = function (categories) {
+
+    notifyByTelegram(categories)
+    notifyByEmail(categories)
 }
 
 module.exports.translateCategories = function (categories, dictionary) {

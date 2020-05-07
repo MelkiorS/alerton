@@ -15,16 +15,15 @@ let cacheDictionary;
 
 async function start() {
     try {
-        bot.sendMessage(keys.botMsgId,' <a href="http://www.example.com/">inline URL</a>', {parse_mode : 'HTML'})
         await initialization()
         cron.schedule(` */${keys.wakeUpPeriod} * * * *`,()=>{
-            // utils.wakeUp()
+            utils.wakeUp()
         },{scheduled: true})
 
         cron.schedule(` */${keys.checkMinutes} 4-20 * * *`, () => {
             const random = Math.floor(Math.random() * Math.floor(keys.checkMinutes - 1))
             const delay = random * 60000
-            // setTimeout(()=> parserLogic(), delay)
+            setTimeout(()=> parserLogic(), delay)
         }, {scheduled: true});
     } catch (e) {
         console.log('Server Error =>', e.message)
@@ -35,7 +34,6 @@ async function start() {
 
 async function parserLogic() {
     console.log(`start parserLogic`);
-
     const categories = await parser(keys.fullURL());
     const {newestCat, allChangedCat} = utils.checkCategories(categories, cacheCategories)
 
