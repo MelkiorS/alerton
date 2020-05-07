@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const keys = require('../config/keys')
 const translate = require('@vitalets/google-translate-api');
 const axios = require('axios')
-const bot  = require('../controllers/telegram-bot')
+const bot = require('../controllers/telegram-bot')
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -165,13 +165,13 @@ function notifyByEmail(categories) {
 function notifyByTelegram(categories) {
     let message = ''
     categories.forEach(cat => {
-        message += `    <i>${cat.name}</i>\n`
+        message += `<pre>${cat.name}</pre>\n`
         cat.subCategory.forEach(subCat => {
-            message += `        <b>${subCat.name}</b>\n`
-            message += `        <a href=" ${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
+            message += `    <b>${subCat.name}</b>\n`
+            message += `    <a href="${keys.baseURL + subCat.path}">NEW : ${subCat.count}</a>\n`
         })
     })
-    try{
+    try {
         const ignore = bot.sendMessage(keys.botMsgId, message, {parse_mode: 'HTML'})
     } catch (e) {
         console.log(`notifyByTelegram error ${e}`)
@@ -181,24 +181,18 @@ function notifyByTelegram(categories) {
 module.exports.notifyAboutNewDeal = function (categories) {
 
     notifyByTelegram(categories)
-    notifyByEmail(categories)
+    // notifyByEmail(categories)
 }
 
 module.exports.translateCategories = function (categories, dictionary) {
     const lang = dictionary.translator
-    const translated = []
-    categories.forEach(c => translated.push({...c}))
-
-    translated.forEach(cat => {
-        cat.name = lang.get(cat.name.split('.').join('DOT'))
-        const subCatTrans = []
-        cat.subCategory.forEach(subCat => {
-            subCatTrans.push({...subCat, name: lang.get(subCat.name.split('.').join('DOT'))})
-        })
-        cat.subCategory = subCatTrans
+    return categories.map(cat => {
+        const name = lang.get(cat.name.split('.').join('DOT'))
+        const subCategory = cat.subCategory.map(subCat => (
+            {...subCat, name: lang.get(subCat.name.split('.').join('DOT'))}
+        ))
+        return {...cat, name, subCategory}
     })
-
-    return translated
 }
 
 module.exports.saveDictionary = function (dictionary) {
