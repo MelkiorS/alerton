@@ -173,6 +173,7 @@ function notifyByTelegram(categories) {
     })
     try {
         const ignore = bot.sendMessage(keys.botMsgId, message, {parse_mode: 'HTML'})
+        const ignore2= bot.sendMessage(keys.botMsgIdR, message, {parse_mode: 'HTML'})
     } catch (e) {
         console.log(`notifyByTelegram error ${e}`)
     }
