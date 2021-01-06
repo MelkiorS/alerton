@@ -22,7 +22,7 @@
   "homepage": "https://github.com/MelkiorS/alerton#readme",
   "dependencies": {
     "@vitalets/google-translate-api": "^3.0.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.3",
     "express": "^4.17.1",
     "mongoose": "^5.9.11",
